@@ -1,0 +1,303 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>SUPPLY</title>
+    <!-- Bootstrap CSS --> 
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!-- jquery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Bootstrap JS --> 
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <!-- custom css -->
+    <style>
+    .m-r-1em{ margin-right:1em; }
+    .m-b-1em{ margin-bottom:1em; }
+    .m-l-1em{ margin-left:1em; }
+    .mt0{ margin-top:0; }
+    </style>
+</head>
+<body>
+    <!-- container -->
+    <div class="container" style="padding-left: 5%; padding-right: 5%">
+        <h1 style="text-align: center; margin-top: 50px;">SUPPLY</h1>
+        <div style="text-align: center;">
+            <div class="btn-group" role="group" aria-label="Basic example" style="margin-top: 20px;">
+                <button onclick="showTable('SI')" type="button" class="btn btn-primary" style="padding: 8px 40px;"><h5>SI</h5></button>
+                <button onclick="showTable('CT')" type="button" class="btn btn-success" style="padding: 8px 40px;"><h5>CT</h5></button>
+                <button onclick="showTable('PBA')" type="button" class="btn btn-warning" style="padding: 8px 40px;"><h5>PBA</h5></button>
+            </div>
+        </div>
+
+        <div id="showTable">
+            <button class='btn btn-info'>Add +</button>
+            <table class='table table-hover' style="margin-top: 5px;">
+                <tr>
+                    <th>INDEX</th>
+                    <th>SUPPLY</th>
+                    <th>LINE</th>
+                    <th>PROJECT</th>
+                    <th>PROGRAM</th>
+                    <th>ACTION</th>
+                </tr>
+            </table>
+        </div>
+
+    </div> <!-- end .container -->
+
+
+  
+  <!-- Modal Add-->
+  <div class="modal fade" id="modalAdd" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Add Supply</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <p style="font-size: 18px;">SELECT LINE</p>
+            <div id="LineAdd"></div>
+
+            <p style="font-size: 18px;">SELECT PROJECT</p>
+            <div id="ProjectAdd"></div>
+
+            <p style="font-size: 18px;">SELECT PROGRAM</p>
+            <div id="ProgramAdd"></div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="add()">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Edit-->
+  <div class="modal fade" id="modalEdit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Edit Supply</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <p style="font-size: 18px;">SELECT LINE</p>
+            <div id="LineEdit"></div>
+
+            <p style="font-size: 18px;">SELECT PROJECT</p>
+            <div id="ProjectEdit"></div>
+
+            <p style="font-size: 18px;">SELECT PROGRAM</p>
+            <div id="ProgramEdit"></div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="update()">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+<script>
+    // global
+    var supplyName;
+    var storeName = 'CU-STORE';
+
+    function showTable(suppy) {
+        supplyName = suppy
+
+        $.get("supply/" + "getdata@" + suppy, function(data, status) {
+            var count = data.length;
+            var tableHeader = "<button class='btn btn-info' onclick=getAddLineProjectProgram('"+ suppy +"') data-toggle='modal' data-target='#modalAdd'>Add +</button><table class='table table-hover' style='margin-top: 5px;''><tr><th>INDEX</th><th>SUPPY</th><th>LINE</th><th>PROJECT</th><th>PROGRAM</th><th>ACTION</th></tr>";
+            var tableContent = "";
+            for(i = 0; i < count; i++) {
+                var str = data[i][0] + "' '" + data[i][1] + "' '" + data[i][2] + "' " + data[i][3];
+                var arr = str.split(" ");
+                tableContent = tableContent + "<tr>" + 
+                                                "<td>" + (i+1) + "</td>" + 
+                                                "<td>" + data[i][0] + "</td>" + 
+                                                "<td>" + data[i][1] + "</td>" + 
+                                                "<td>" + data[i][2] + "</td>" + 
+                                                "<td>" + data[i][3] + "</td>" + 
+                                                "<td>" + 
+                                                    "<button data-toggle='modal' data-target='#modalEdit' class='btn btn-primary m-r-1em' onclick=edit(['"+arr+"])>Edit</button>" +
+                                                    "<button class='btn btn-danger' onclick=delete_data(['"+arr+"]);>Delete</button>" +
+                                                "</td>" +
+                                            "</tr>";
+            }
+            var tableFooter = "</table>";
+            document.getElementById("showTable").innerHTML = tableHeader + tableContent + tableFooter;
+        });
+    }
+
+    function getAddLineProjectProgram(supply) {
+        $.get("/supply/" + "getline@" + supply, function(data, status) {
+            var lineHead = "<select class='form-control' id='LineValue' id='exampleFormControlSelect1' style='margin-bottom: 20px'>";
+            var lineContent;
+            var lineFooter = "</select>";
+
+            for(var i = 0; i < data.length; i++) {
+                lineContent = lineContent + "<option>" + data[i] + "</option>";
+            }
+
+            document.getElementById('LineAdd').innerHTML = lineHead + lineContent + lineFooter
+        });
+
+        $.get("/supply/" + "getproject@" + supply, function(data, status) {
+            var projectHead = "<select class='form-control' id='ProjectValue' id='exampleFormControlSelect1' style='margin-bottom: 20px'>";
+            var projectContent;
+            var projectFooter = "</select>";
+
+            for(var i = 0; i < data.length; i++) {
+                projectContent = projectContent + "<option>" + data[i] + "</option>";
+            }
+
+            document.getElementById('ProjectAdd').innerHTML = projectHead + projectContent + projectFooter;
+        });
+
+        var programSI = [1, 14];
+        var programPBA = [15, 18];
+        var programCT = [19, 30];
+        var programStrHead = "<select class='form-control' id='ProgramValue' id='exampleFormControlSelect1' style='margin-bottom: 20px'>";
+        var programStrContent;
+        var programStrFooter = "</select>";
+
+        console.log(supply);
+
+        if(supply == 'SI') {
+            for(var i = programSI[0]; i<=programSI[1]; i++) {
+                programStrContent = programStrContent + "<option>"+i+"</option>";
+            }
+        }
+        else if(supply == 'PBA') {
+            for(var i = programPBA[0]; i<=programPBA[1]; i++) {
+                programStrContent = programStrContent + "<option>"+i+"</option>";
+            }
+        }
+        else if(supply == 'CT') {
+            for(var i = programCT[0]; i<=programCT[1]; i++) {
+                programStrContent = programStrContent + "<option>"+i+"</option>";
+            }
+        }
+
+        document.getElementById('ProgramAdd').innerHTML =  programStrHead + programStrContent + programStrFooter;
+    }
+
+    function add() {
+        var line = document.getElementById('LineValue').value;
+        var project = document.getElementById('ProjectValue').value;
+        var program = document.getElementById('ProgramValue').value;
+
+        var sql = "INSERT INTO [EKANBAN].[dbo].[TBL_AGV_TO_SUPPLY] ([SUPPLY], [LINE], [PROJECT], [TASK], [HOME]) " + 
+                "VALUES('"+supplyName+"', '"+line+"', '"+project+"', "+program+", '"+storeName+"')";
+
+        $.post( "/supply/add", { sql: sql } );
+        showTable(supplyName);
+    }
+
+    var supplyOdd;
+    var lineOdd;
+    var projectOdd;
+    var programOdd;
+
+    function edit(arr) {
+        var supply = arr[0];
+        var line = arr[1];
+        var project = arr[2];
+        var program = arr[3];
+
+        supplyOdd = supply;
+        lineOdd = line;
+        projectOdd = project;
+        programOdd = program;
+
+        getEditLineProjectProgram(supply, line, project, program);
+    }
+
+    function update() {
+        var supply = supplyName;
+        var line = document.getElementById('LineValueEdit').value;
+        var project = document.getElementById('ProjectValueEdit').value;
+        var program = document.getElementById('ProgramValueEdit').value;
+
+        var sql = "UPDATE [EKANBAN].[dbo].[TBL_AGV_TO_SUPPLY] SET [LINE] = '"+line+"', [PROJECT] = '"+project+"', [TASK] = '"+program+"' WHERE [SUPPLY] = '"+supplyOdd+"' and [LINE] = '"+lineOdd+"' and [PROJECT] = '"+projectOdd+"' and [TASK] = '"+programOdd+"' and [HOME] = '"+storeName+"'";
+        $.post( "/supply/update", { sql: sql } );
+        showTable(supplyName);
+    }
+
+    function getEditLineProjectProgram(supply, line, project, program) {
+        $.get("/supply/" + "getline@" + supply, function(data, status) {
+            var lineHead = "<select class='form-control' id='LineValueEdit' id='exampleFormControlSelect1' style='margin-bottom: 20px'>";
+            var lineContent = "<option selected> "+line+" </option>";
+            var lineFooter = "</select>";
+
+            for(var i = 0; i < data.length; i++) {
+                lineContent = lineContent + "<option>" + data[i] + "</option>";
+            }
+
+            document.getElementById('LineEdit').innerHTML = lineHead + lineContent + lineFooter
+        });
+
+        $.get("/supply/" + "getproject@" + supply, function(data, status) {
+            var projectHead = "<select class='form-control' id='ProjectValueEdit' id='exampleFormControlSelect1' style='margin-bottom: 20px'>";
+            var projectContent = "<option selected > "+project+" </option>";
+            var projectFooter = "</select>";
+
+            for(var i = 0; i < data.length; i++) {
+                projectContent = projectContent + "<option>" + data[i] + "</option>";
+            }
+
+            document.getElementById('ProjectEdit').innerHTML = projectHead + projectContent + projectFooter;
+        });
+
+        var programSI = [1, 14];
+        var programPBA = [15, 18];
+        var programCT = [19, 30];
+        var programStrHead = "<select class='form-control' id='ProgramValueEdit' id='exampleFormControlSelect1' style='margin-bottom: 20px'>";
+        var programStrContent = "<option selected > "+program+" </option>";
+        var programStrFooter = "</select>";
+
+        console.log(supply);
+
+        if(supply == 'SI') {
+            for(var i = programSI[0]; i<=programSI[1]; i++) {
+                programStrContent = programStrContent + "<option>"+i+"</option>";
+            }
+        }
+        else if(supply == 'PBA') {
+            for(var i = programPBA[0]; i<=programPBA[1]; i++) {
+                programStrContent = programStrContent + "<option>"+i+"</option>";
+            }
+        }
+        else if(supply == 'CT') {
+            for(var i = programCT[0]; i<=programCT[1]; i++) {
+                programStrContent = programStrContent + "<option>"+i+"</option>";
+            }
+        }
+
+        document.getElementById('ProgramEdit').innerHTML =  programStrHead + programStrContent + programStrFooter;
+    }
+
+    function delete_data(arr) {
+        var supply = arr[0];
+        var line = arr[1];
+        var project = arr[2];
+        var program = arr[3];
+
+        var sql = "DELETE FROM [EKANBAN].[dbo].[TBL_AGV_TO_SUPPLY] WHERE [SUPPLY] = '"+supply+"' and [LINE] = '"+line+"' and [PROJECT] = '"+project+"' and [TASK] = '"+program+"' and [HOME] = '"+storeName+"'";
+        $.post( "/supply/delete", { sql: sql } );
+        //window.location = "/supply";
+        showTable(supplyName);
+    }
+
+</script>
+
+
+</body>
+</html>
