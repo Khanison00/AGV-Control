@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{% block title %} Welcome to FlaskBlog {% endblock %}</h1>
+
+<!-- <form action="http://localhost:5000/uploader" method="POST" enctype="multipart/form-data">
+    <p>Only show Excel (.xlsx) files...</p>
+    <div>
+        <input type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" name="file" />
+    </div>
+    <input type="submit" />
+</form> -->
+
+<form id="form1" runat="server">
+    <div>
+        <input type="file" id="excelfile" /> 
+        <input type="button" id="viewfile" value="Export To Table" onclick="ExportToTable()" /> 
+          <br /> 
+          <br /> 
+        <table id="exceltable" class="table table-hover"> </table>
+    </div>
+</form>
+
+
+{% endblock %}

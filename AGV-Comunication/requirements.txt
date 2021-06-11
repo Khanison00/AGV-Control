@@ -1,0 +1,7 @@
+pyodbc
+requests
+flask
+flask_restful
+DateTime
+openpyxl
+pathlib

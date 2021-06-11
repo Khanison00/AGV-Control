@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"> -->
+    <link rel="stylesheet" href="{{ url_for ('static', filename='css/bootstrap.css') }}" >
+
+    <title>{% block title %} {% endblock %}</title>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-md navbar-light bg-light">
+        <a class="navbar-brand" href="{{ url_for('index')}}">FlaskBlog</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+            <li class="nav-item active">
+                <a class="nav-link" href="#">About</a>
+            </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container">
+        {% block content %} {% endblock %}
+    </div>
+
+    <!-- javascript -->
+    <script type="text/javascript">
+      function ExportToTable() {
+          var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xlsx)$/;
+          /*Checks whether the file is a valid excel file*/
+          if (regex.test($("#excelfile").val().toLowerCase())) {
+              var xlsxflag = false; /*Flag for checking whether excel is .xls format or .xlsx format*/
+              if ($("#excelfile").val().toLowerCase().indexOf(".xlsx") > 0) {
+                  xlsxflag = true;
+              }
+              /*Checks whether the browser supports HTML5*/
+              if (typeof (FileReader) != "undefined") {
+                  var reader = new FileReader();
+                  reader.onload = function (e) {
+                      var data = e.target.result;
+                      /*Converts the excel data in to object*/
+                      if (xlsxflag) {
+                          var workbook = XLSX.read(data, { type: 'binary' });
+                      }
+                      else {
+                          var workbook = XLS.read(data, { type: 'binary' });
+                      }
+                      /*Gets all the sheetnames of excel in to a variable*/
+                      var sheet_name_list = workbook.SheetNames;
+  
+                      var cnt = 0; /*This is used for restricting the script to consider only first sheet of excel*/
+                      sheet_name_list.forEach(function (y) { /*Iterate through all sheets*/
+                          /*Convert the cell value to Json*/
+                          if (xlsxflag) {
+                              var exceljson = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
+                          }
+                          else {
+                              var exceljson = XLS.utils.sheet_to_row_object_array(workbook.Sheets[y]);
+                          }
+                          
+                          if (exceljson.length > 0 && cnt == 0) {
+                              BindTable(exceljson, '#exceltable');
+                              cnt++;
+                          }
+                      });
+                      $('#exceltable').show();
+                  }
+                  if (xlsxflag) {/*If excel file is .xlsx extension than creates a Array Buffer from excel*/
+                      reader.readAsArrayBuffer($("#excelfile")[0].files[0]);
+                  }
+                  else {
+                      reader.readAsBinaryString($("#excelfile")[0].files[0]);
+                  }
+              }
+              else {
+                  alert("Sorry! Your browser does not support HTML5!");
+              }
+          }
+          else {
+              alert("Please upload a valid Excel file!");
+          }
+      }
+  
+      function BindTable(jsondata, tableid) {/*Function used to convert the JSON array to Html Table*/
+          
+        // clear object before new append
+        $(tableid).empty();
+
+        var columns = BindTableHeader(jsondata, tableid); /*Gets all the column headings of Excel*/
+          for (var i = 0; i < jsondata.length; i++) {
+              var row$ = $('<tr/>');
+              for (var colIndex = 0; colIndex < columns.length; colIndex++) {
+                  var cellValue = jsondata[i][columns[colIndex]];
+                  if (cellValue == null)
+                      cellValue = "";
+                  row$.append($('<td/>').html(cellValue));
+              }
+              $(tableid).append(row$);
+          }
+      }
+      function BindTableHeader(jsondata, tableid) {/*Function used to get all column names from JSON and bind the html table header*/
+          var columnSet = [];
+          var headerTr$ = $('<tr/>');
+          for (var i = 0; i < jsondata.length; i++) {
+              var rowHash = jsondata[i];
+              for (var key in rowHash) {
+                  if (rowHash.hasOwnProperty(key)) {
+                      if ($.inArray(key, columnSet) == -1) {/*Adding each unique column names to a variable array*/
+                          columnSet.push(key);
+                          headerTr$.append($('<th/>').html(key));
+                      }
+                  }
+              }
+          }
+          $(tableid).append(headerTr$);
+          return columnSet;
+      }
+  </script>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script> -->
+    <!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script> -->
+    
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" type="text/javascript"></script> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.7.7/xlsx.core.min.js"></script> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xls/0.7.4-a/xls.core.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js" integrity="sha384-q2kxQ16AaE6UbzuKqyBE9/u/KzioAlnx2maXQHiDX9d4/zp8Ok3f+M7DPm+Ib6IU" crossorigin="anonymous"></script>
+  </body>
+</html>

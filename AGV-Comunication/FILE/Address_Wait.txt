@@ -1,0 +1,48 @@
+@ CU-KITTING
+addr1	89
+addr2	90
+addr3 	case 	91
+addr4	case 	137
+	case	197
+		T1[45] => addr 39
+		T2[45] => addr 39
+		T3[44] => addr 38
+		T4[43] => addr 37
+		T5[64] => addr 58
+	
+---------------------------------------------------
+@ SIWH
+addr1	229
+addr2	230
+addr3	case	231
+
+	case	75
+		T[SI][1-14](57) => 	addr 	53
+		T[SIG][28](69) => 	addr 	53
+		T[CUG][29](74) => 	addr 	58
+		T[PS][30](40,{38}) => 	addr 	36
+	case	232
+		T[SIG][28](67) => addr 58
+		T[CUG][29](74) => addr 65
+---------------------------------------------------
+@ CU-STORE
+addr1	1(CT)	4(SI)	6(CU)
+addr2	2(CT)	5(SI)	10(CU)
+
+addr-select	8(ALL)
+			T[SI][1-14](33) => addr 31
+			T[PBA][15](45) => addr 43
+			T[PBA][16](44) => addr 42
+			T[PBA][17](43) => addr 41
+			T[CT][21-30](37) => addr 35
+	case	39(SI)
+		T[SI][1-14](33) => addr 23
+	case	195(Back CU CT)
+		T[PBA][21-30](45) => addr 40
+		T[PBA][21-30](44) => addr 39
+		T[PBA][21-30](43) => addr 38
+		T[CT][21-30](33) => addr 31
+	
+	*** EDIT AFTER 12 [CT] COUNT POINT LOSS ***
+
+	
